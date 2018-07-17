@@ -87,6 +87,14 @@ app.use(function(req, res, next){
 	delete req.session.flash;
 	next();
 });
+
+app.use(require('./lib/tourRequiresWaiver'));
+
+var cartValidation = require('./lib/cartValidation');
+app.use(cartValidation.checkWaivers);
+app.use(cartValidation.checkGuestCounts);
+
+
 app.get('/', function(req, res){
     // res.type('text/plain');
     // res.send('Meadowlark Travel');
