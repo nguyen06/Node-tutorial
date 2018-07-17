@@ -3,12 +3,17 @@ var credentials = require('./credentials.js');
 
 var formidable = require('formidable');
 var app = express();
+var fortune = require('./lib/fortune.js');
 
 app.use(require('body-parser')());
 app.use(express.static(__dirname + '/public'));
 app.use(require('cookie-parser')(credentials.cookieSecret));
 app.use(require('express-session')());
 
+app.use(function(req,res,next){
+    res.locals.showTests = app.get('evn') !== 'production' && req.query.test === '1';
+    next();
+});
 // set up handlebars view engine
 var handlebars = require('express3-handlebars') .create({ 
     defaultLayout:'main',
@@ -22,11 +27,6 @@ var handlebars = require('express3-handlebars') .create({
 });
 app.engine('handlebars', handlebars.engine);
 app.set('view engine', 'handlebars');
-var fortunes = [
-    "Conquer your fears or they will conquer you.", "Rivers need springs.",
-    "Do not fear what you don't know.",
-    "You will have a pleasant surprise.", "Whenever possible, keep it simple.",
-    ];
 app.set('port', process.env.PORT || 3000);
 // mocked weather data
 function getWeatherData(){
@@ -116,6 +116,7 @@ app.get('/data/nursery-rhyme', function(req, res){
 app.get('/about',function(req, res){
     // res.type('text/plain');
     // res.send('About Meadowlark travel');
+
     var randomFortune = fortunes[Math.floor(Math.random() * fortunes.length)];
     res.cookie('monster', 'nom nom');
     res.cookie('signed_monster', 'nom nom', { signed: true});
@@ -166,6 +167,8 @@ app.post('/process', function(req, res){
             res.redirect(303, '/thank-you');
         }
     });
+
+
 //custom 404 page
 app.use(function(req, res, next){
     // res.type('text/plain');
