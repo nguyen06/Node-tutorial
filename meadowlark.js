@@ -4,6 +4,14 @@ var credentials = require('./credentials.js');
 var formidable = require('formidable');
 var app = express();
 var fortune = require('./lib/fortune.js');
+var nodemailer = require('nodemailer');
+var mailTransport = nodemailer.createTransport('SMTP', {
+    service: 'Gmail',
+    auth: {
+        user: credentials.gmail.user,
+        pass: credentials.gmail.password,
+    }
+});
 
 app.use(require('body-parser')());
 app.use(express.static(__dirname + '/public'));
